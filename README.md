@@ -19,7 +19,13 @@ Rahhal is a multi-role **Flutter** application for intercity and cross-border pa
 - Runtime backend identifiers removed from the public source and injected at build/deploy time
 
 ## Screenshots
+<h3 align="center">Passenger & Driver Experience</h3>
 
+<p align="center">
+  <img src="docs/screenshots/passenger-home.jpg" width="30%" alt="Passenger Home">
+  <img src="docs/screenshots/support-chat.jpg" width="30%" alt="Support Chat">
+  <img src="docs/screenshots/driver-trip-management.jpg" width="30%" alt="Driver Trip Management">
+</p>
 <table>
   <tr>
     <td align="center"><b>Login</b><br><img src="docs/screenshots/login.jpg" width="210"></td>
