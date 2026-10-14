@@ -1,0 +1,180 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../providers/support_providers.dart';
+import '../../domain/models/support_ticket.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+
+class SupportCreateTicketScreen extends ConsumerStatefulWidget {
+  final String userType;
+  const SupportCreateTicketScreen({super.key, required this.userType});
+
+  @override
+  ConsumerState<SupportCreateTicketScreen> createState() =>
+      _SupportCreateTicketScreenState();
+}
+
+class _SupportCreateTicketScreenState
+    extends ConsumerState<SupportCreateTicketScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String _priority = 'low';
+  bool _isLoading = false;
+
+  Future<void> _submitTicket() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final authState = ref.read(authProvider);
+    if (authState is Authenticated) {
+      final repo = ref.read(supportRepositoryProvider(widget.userType));
+
+      final ticket = SupportTicket(
+        ticketId: '',
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        status: 'open',
+        priority: _priority,
+        category: 'general',
+        userId: authState.user.uid,
+        userType: widget.userType,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      try {
+        await repo.createTicket(ticket);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إنشاء التذكرة بنجاح'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          context.pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('حدث خطأ: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('إنشاء تذكرة دعم'), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'تفاصيل المشكلة',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+
+              // Title
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'عنوان التذكرة',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.title),
+                ),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'يرجى إدخال عنوان للتذكرة'
+                    : null,
+              ),
+              const SizedBox(height: 16),
+
+              // Priority
+              DropdownButtonFormField<String>(
+                initialValue: _priority,
+                decoration: const InputDecoration(
+                  labelText: 'الأهمية',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.low_priority),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'low', child: Text('منخفضة')),
+                  DropdownMenuItem(value: 'medium', child: Text('متوسطة')),
+                  DropdownMenuItem(value: 'high', child: Text('عالية')),
+                  DropdownMenuItem(value: 'urgent', child: Text('عاجلة جداً')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _priority = value);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Description
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'وصف المشكلة',
+                  border: OutlineInputBorder(),
+                  alignLabelWithHint: true,
+                ),
+                maxLines: 5,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'يرجى وصف المشكلة بالتفصيل'
+                    : null,
+              ),
+              const SizedBox(height: 32),
+
+              // Submit
+              SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _submitTicket,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'إرسال التذكرة',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+}

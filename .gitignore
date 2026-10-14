@@ -1,0 +1,101 @@
+# Rahhal - Git ignore rules
+
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# IDEs / editors
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+analyze*.txt
+flutter_*.log
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+service-account*.json
+*service_account*.json
+firebase-adminsdk*.json
+
+# Android signing / local configuration
+android/key.properties
+android/local.properties
+android/app/*.jks
+android/app/*.keystore
+**/key.properties
+
+# Apple generated / local
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/ephemeral/
+
+# Firebase local/cache files
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Node / Firebase Functions
+**/node_modules/
+functions/lib/
+functions/.env
+functions/.env.*
+functions/.runtimeconfig.json
+
+# Supabase local state / secrets
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/.env.*
+
+# Generated / scratch files used during development
+lib/scratch.dart
+lib/test_index.dart
+project_structure.txt
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# Local runtime configuration
+config/dart_defines.local.json
+**/dart_defines.local.json
+
+# Firebase platform config files (keep private in this portfolio repo)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
